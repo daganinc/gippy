@@ -1,5 +1,4 @@
-FROM developmentseed/geolambda:latest
- 
+FROM developmentseed/geolambda:1.2.0
 WORKDIR /build
 
 RUN \

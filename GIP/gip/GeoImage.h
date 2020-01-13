@@ -317,7 +317,39 @@ namespace gip {
             }
             return Pixels;
         }
-
+	//! Extract, and interpolate, time series (C is time axis)
+	// TODO - review this function to be more general extraction over bands
+	template<class T, class t> CImg<T> timeseries(CImg<t> times, Chunk chunk=Chunk()) {
+	  CImg<T> cimg = read<T>(chunk);
+	  T ndval = _RasterBands[0].nodata();
+	  if (nbands() > 2) {
+	    int lowi, highi;
+	    float y0, y1, x0, x1;
+	    for (int c=1; c<nbands()-1;c++) {
+	      cimg_forXY(cimg,x,y) {
+                if (cimg(x,y,c) == ndval) {
+		  // Find next lowest point
+		  lowi = highi = 1;
+		  while ((cimg(x,y,c-lowi) == ndval) && (lowi<c)) lowi++;
+		  while ((cimg(x,y,c+highi) == ndval) && (c+highi < nbands()-1) ) highi++;
+		  y0 = cimg(x,y,c-lowi);
+		  y1 = cimg(x,y,c+highi);
+		  x0 = times(c-lowi);
+		  x1 = times(c+highi);
+		  if ((y0 != ndval) && (y1 != ndval)) {
+		    cimg(x,y,c) = y0 + (y1-y0) * ((times(c)-x0)/(x1-x0));
+		  }
+                } else if (cimg(x,y,c-1) == ndval) {
+		  T val = cimg(x,y,c);
+		  for (int i=c-1; i>=0; i--) {
+		    if (cimg(x,y,i) == ndval) cimg(x,y,i) = val;
+		  }
+                }
+	      }
+	    }
+	  }
+	  return cimg;
+	}
 
         //! Extract spectra from pixels where not nodata, return as 2-d array
         template<class T> CImg<T> extract_classes(const GeoRaster& classmap) {
