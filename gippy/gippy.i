@@ -223,6 +223,9 @@ namespace gip {
         PyObject* read_random_pixels(int num_pixels) {
             return CImgToArr(self->read_random_pixels<double>(num_pixels));
         }
+	PyObject* timeseries(CImg<double> C, Chunk chunk=Chunk()) {
+            return CImgToArr(self->timeseries<double>(C, chunk));
+        }
         PyObject* extract_classes(GeoRaster raster) {
             // TODO - look at all bands for gain and offset
             if (!(*self)[0].is_double()) {
