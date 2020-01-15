@@ -68,7 +68,7 @@ namespace std {
 
 // Wrap GIPS
 %{
-    #include <python2.7/Python.h>
+    #include <Python.h>
     #include <gip/gip.h>
     #include <gip/utils.h>
     #include <gip/geometry.h>
