@@ -317,7 +317,77 @@ namespace gip {
             }
             return Pixels;
         }
+	//! Extract, and interpolate, time series (C is time axis)
+	// TODO - review this function to be more general extraction over bands
+	template<class T, class t> CImg<T> timeseries(CImg<t> times, Chunk chunk=Chunk(), int spec_bands=1) {
+	  if (nbands() % spec_bands)
+	    throw std::out_of_range(nbands() + " is not an integer multiple of " + spec_bands);
 
+	  CImg<T> cimg = read<T>(chunk);
+	  T ndval = _RasterBands[0].nodata();
+	  if (nbands() > 2 * spec_bands) {
+	    float y0, y1, x0, x1;
+	    /* All images in the timeseries are assumed to have the same
+	       number of spectral bands (spec_bands)
+	    */
+
+	    for (int band=0; band<spec_bands; band++){
+	      // Top and Bottom bourndry cases are handeled seperatly
+	      // tidx is the time index corresponding to the current image c
+	      for (int c=spec_bands+band, tidx=1; c<nbands()-spec_bands; c+=spec_bands, tidx++) {
+		cimg_forXY(cimg,x,y) {
+		  if (cimg(x,y,c) == ndval) {
+
+		    // Find the first valid past time neighbour if possible
+		    int lowi = c - spec_bands;
+		    int lowt = tidx - 1;
+		    while ((lowi>=spec_bands) && (cimg(x,y,lowi)==ndval)){
+		      lowi -= spec_bands;
+		      lowt--;
+		    }
+
+		    // Find the first valid future time neighbour if possible
+		    int highi = c + spec_bands;
+		    int hight = tidx + 1;
+		    while ((highi<nbands()-spec_bands) && (cimg(x,y,highi)==ndval)){
+		      highi += spec_bands;
+		      hight++;
+		    }
+
+		    y0 = cimg(x,y,lowi);
+		    y1 = cimg(x,y,highi);
+		    x0 = times(lowt);
+		    x1 = times(hight);
+
+		    if ((y0 != ndval) && (y1 != ndval)) {
+		      cimg(x,y,c) = y0 + (y1-y0) * ((times(tidx)-x0)/(x1-x0));
+		    }
+		    else if (y0 != ndval) cimg(x,y,c) = y0;
+		    else if (y1 != ndval) cimg(x,y,c) = y1;
+		  }
+		}
+	      }
+	    }
+
+            // handle the top and the bottom bourdy images
+            int bounds_idx[2] = {0, nbands()-spec_bands};
+            int up = 1;
+            for (int idx : bounds_idx){
+
+                for (int i=idx; i<idx+spec_bands; i++){
+
+                    cimg_forXY(cimg, x, y){
+
+                        if (cimg(x, y, i) == ndval)
+                            cimg(x, y, i) = cimg(x,y, i + up * spec_bands);
+                    }
+                }
+                // bottom image done. top image should look douwn (up = -1)
+                up = -1;
+            }
+          }
+	  return cimg;
+	}
 
         //! Extract spectra from pixels where not nodata, return as 2-d array
         template<class T> CImg<T> extract_classes(const GeoRaster& classmap) {

@@ -10,13 +10,6 @@ services:
     volumes:
       - '.:/home/geolambda/work'
 
-  test27:
-    image: 'gippy:latest'
-    entrypoint: bash -c 'python -m pytest -v'
-    working_dir: /home/geolambda/test
-    volumes:
-      - './test:/home/geolambda/test'
-
   test36:
     image: 'gippy:latest'
     entrypoint: bash -c 'python3 -m pytest -v'
