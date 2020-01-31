@@ -368,24 +368,24 @@ namespace gip {
 		}
 	      }
 	    }
-	  }
-	  // handle the top and the bottom bourdy images
-	  int bounds_idx[2] = {0, nbands()-spec_bands};
-	  int up = 1;
-	  for (int idx : bounds_idx){
 
-	    for (int i=idx; i<idx+spec_bands; i++){
+            // handle the top and the bottom bourdy images
+            int bounds_idx[2] = {0, nbands()-spec_bands};
+            int up = 1;
+            for (int idx : bounds_idx){
 
-	      cimg_forXY(cimg, x, y){
+                for (int i=idx; i<idx+spec_bands; i++){
 
-		if (cimg(x, y, i) == ndval)
-		  cimg(x, y, i) = cimg(x,y, i + up * spec_bands);
-	      }
-	    }
-	    // bottom image done. top image should look douwn (up = -1)
-	    up = -1;
-	  }
+                    cimg_forXY(cimg, x, y){
 
+                        if (cimg(x, y, i) == ndval)
+                            cimg(x, y, i) = cimg(x,y, i + up * spec_bands);
+                    }
+                }
+                // bottom image done. top image should look douwn (up = -1)
+                up = -1;
+            }
+          }
 	  return cimg;
 	}
 
