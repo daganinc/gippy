@@ -214,3 +214,58 @@ class GeoImageTests(unittest.TestCase):
         geoimg.warp_into(imgout)
         self.assertEqual(imgout.read().sum(), geoimg.read().sum())
 
+    def test_timeseries(self):
+        """ Linear approximation of missing values in a timeseries of stacked images"""
+        # build a stack of (4,4)  images with 6 bands composed of the following
+        bands = np.zeros((6, 4, 4))
+        bands[0] = np.arange(16).reshape(4, 4)
+        bands[2] = np.arange(17, 33).reshape(4, 4)
+        # image 1 is all 0, add a 99 for fun.
+        bands[1][1,3] = 99
+        # 0 is going to be ndval
+        bands[0][1,2] = 0
+        bands[2][2,2] = 0
+        bands[2][1,2] = 0
+        bands[3] = bands[2]
+        bands[4] = bands[1]
+        bands[5] = bands[0]
+        # make temporary image
+        img = gp.GeoImage.create("", 4, 4, 6)
+        img.set_nodata(0)
+        # create 6 bands of the form 012210
+        for i in range(6):
+            img[i].write(bands[i])
+
+        times = np.arange(1,7, dtype='float64')
+        ts = img.timeseries(times, spec_bands=2)
+        expected = np.array([[[17.,  1.,  2.,  3.],
+                              [ 4.,  5.,  0.,  7.],
+                              [ 8.,  9., 10., 11.],
+                              [12., 13., 14., 15.]],
+
+                             [[17., 18., 19., 20.],
+                              [21., 22.,  0., 99.],
+                              [25., 26., 10., 28.],
+                              [29., 30., 31., 32.]],
+
+                             [[17., 18., 19., 20.],
+                              [21., 22.,  0., 24.],
+                              [25., 26., 10., 28.],
+                              [29., 30., 31., 32.]],
+
+                             [[17., 18., 19., 20.],
+                              [21., 22.,  0., 24.],
+                              [25., 26., 10., 28.],
+                              [29., 30., 31., 32.]],
+
+                             [[17., 18., 19., 20.],
+                              [21., 22.,  0., 99.],
+                              [25., 26., 10., 28.],
+                              [29., 30., 31., 32.]],
+
+                             [[17.,  1.,  2.,  3.],
+                              [ 4.,  5.,  0.,  7.],
+                              [ 8.,  9., 10., 11.],
+                              [12., 13., 14., 15.]]])
+
+        assert_array_equal(ts, expected)
