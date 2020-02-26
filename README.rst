@@ -5,13 +5,25 @@ GIPPY
     :target: https://circleci.com/gh/gipit/gippy
 
 
-Gippy is a Python library for image processing of geospatial raster data. The core of the library is implemented as a C++ library, libgip, with Python bindings automatically generated with `swig <http://www.swig.org/>`_. Gippy encapsulates the functionality of `GDAL <http://www.gdal.org/>`_ and `CImg <http://cimg.eu/>`_ that automatically handles issues common to geospatial data, such as handling of nodata values and chunking up of very large images by saving chains of functions and only processing the image in pieces upon a read request. In addition to providing a library of image processing functions and algorithms, Gippy can also be used as a simpler interface to GDAL for the opening, creating, reading and writing of geospatial raster files in Python.
+Gippy is a Python library for image processing of geospatial raster data. The
+core of the library is implemented as a C++ library, libgip, with Python
+bindings automatically generated with `swig <http://www.swig.org/>`_. Gippy
+encapsulates the functionality of `GDAL <http://www.gdal.org/>`_ and
+`CImg <http://cimg.eu/>`_ that automatically handles issues common to
+geospatial data, such as handling of nodata values and chunking up of very
+large images by saving chains of functions and only processing the image in
+pieces upon a read request. In addition to providing a library of image
+processing functions and algorithms, Gippy can also be used as a simpler
+interface to GDAL for the opening, creating, reading and writing of geospatial
+raster files in Python.
 
-See the full `documentation <https://gippy.readthedocs.io>`_.
+For additional documentation (which may not be maintained) see
+https://gippy.readthedocs.io.
 
 
 Authors and Contributors
 ++++++++++++++++++++++++
+(but note this list isn't maintained):
 
 - Matthew Hanson
 - Ian Cooke
@@ -21,9 +33,6 @@ Authors and Contributors
 .. code::
 
     **GIPPY**: Geospatial Image Processing for Python
-
-    AUTHOR: Matthew Hanson
-    EMAIL:  matt.a.hanson@gmail.com
 
     Copyright (C) 2015 Applied Geosolutions
     EMAIL: oss@appliedgeosolutions.com
@@ -39,5 +48,3 @@ Authors and Contributors
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
-
