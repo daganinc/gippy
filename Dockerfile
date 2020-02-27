@@ -1,21 +1,8 @@
-FROM developmentseed/geolambda:latest
- 
+FROM developmentseed/geolambda:1.0.0
+
 WORKDIR /build
-
-RUN \
-    yum install -y swig \
-        && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-        && python3 get-pip.py
-
-COPY requirements*txt /build/
-RUN \
-    pip3 install -r requirements.txt; \
-    pip3 install -r requirements-dev.txt;
-
 COPY . /build
-RUN \
-    git clean -xfd; \
-    pip3 install . ; \
-    rm -rf /build/*;
+RUN ./install.sh
 
-WORKDIR /home/geolambda
+# dunno if the clean & rm actions are needed for a dev/test/ci build that's done in place:
+# git clean -xfd && pip3 install . && rm -rf /build/*
