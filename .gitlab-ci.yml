@@ -1,0 +1,22 @@
+make_image:
+  stage: build
+  script:
+    - git checkout $CI_COMMIT_REF_NAME
+    - git fetch
+    - git reset --hard origin/$CI_COMMIT_REF_NAME
+    - time docker build . --no-cache -t gippy:$CI_COMMIT_REF_SLUG
+  tags:
+    - gipsdev
+  after_script:
+   - docker system prune -f
+
+
+run_tests:
+  stage: test
+  script:
+    - docker run --rm gippy:$CI_COMMIT_REF_SLUG /root/venv/bin/pytest
+  tags:
+    - gipsdev
+  after_script:
+    - docker image rm gippy:$CI_COMMIT_REF_SLUG
+    - docker system prune -f
