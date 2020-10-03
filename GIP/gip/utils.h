@@ -167,6 +167,10 @@ namespace gip {
             return nResult;
         }
 
+        virtual int Transform( int nCount, double *x, double *y, double *z = NULL, double *t=NULL, int *pabSuccess = NULL ) {
+            return GDALGenImgProjTransform( hSrcImageTransformer, TRUE, nCount, x, y, z, pabSuccess );
+        }
+
         virtual int TransformEx( int nCount, double *x, double *y, double *z = NULL, int *pabSuccess = NULL ) {
             return GDALGenImgProjTransform( hSrcImageTransformer, TRUE, nCount, x, y, z, pabSuccess );
         }

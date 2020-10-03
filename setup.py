@@ -182,6 +182,8 @@ extra_compile_args = ['-fPIC', '-O3', '-std=c++11']
 
 if gdal_config.version()[0] == 2:
     extra_compile_args.append('-D GDAL2')
+elif gdal_config.version()[0] == 3:
+    extra_compile_args.append('-D GDAL3')
 
 extra_link_args = gdal_config.extra_link_args
 
