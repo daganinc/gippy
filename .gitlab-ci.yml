@@ -1,9 +1,10 @@
 make_image:
   stage: build
   script:
-    - git checkout $CI_COMMIT_REF_NAME
     - git fetch
+    - git checkout $CI_COMMIT_REF_NAME
     - git reset --hard origin/$CI_COMMIT_REF_NAME
+    - git clean -xfd
     - time docker build . --no-cache -t gippy:$CI_COMMIT_REF_SLUG
   tags:
     - gipsdev
@@ -14,7 +15,7 @@ make_image:
 run_tests:
   stage: test
   script:
-    - docker run --rm gippy:$CI_COMMIT_REF_SLUG /root/venv/bin/pytest
+    - docker run --rm gippy:$CI_COMMIT_REF_SLUG pytest --cov gippy
   tags:
     - gipsdev
   after_script:
