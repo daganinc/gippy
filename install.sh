@@ -1,20 +1,27 @@
 #!/bin/bash
 
-# TODO tied for now to `FROM developmentseed/geolambda:1.0.0`; see Dockerfile
-
 set -ev
 
-yum install -y swig
+. /etc/lsb-release
 
-# setup & install python env
-python3 -m venv ~/venv
-source ~/venv/bin/activate
-pip install --upgrade pip # honestly just to make the warnings go away
+# Only supported for ubuntu 20.04;  Older versions require ubuntugis ppa
+[ "${DISTRIB_ID}" = "Ubuntu" -a "${DISTRIB_RELEASE}" = "20.04" ]
 
-# install gippy itself
-# TODO shouldn't need to install requirements files; they're in setup.py already
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
-pip install . --no-cache # not sure if need -e
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get upgrade -y
+# Not needed for 20.04, but might be on other versions
+#apt-get install -y software-properties-common
+#add-apt-repository -y ppa:ubuntugis/ppa
+apt-get -y update
+apt-get install -y \
+        python3  python3-dev \
+        libgdal-dev  python-is-python3  \
+        swig  wget  curl build-essential
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 get-pip.py
+pip3 install -r requirements.txt
+pip3 install -r requirements-dev.txt
+pip3 install . --no-cache
+apt-get -y autoclean
 
-# pytest --cov gippy # last circleci thing before it exits TODO

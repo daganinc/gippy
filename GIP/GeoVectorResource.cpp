@@ -36,7 +36,7 @@ namespace gip {
     GeoVectorResource::GeoVectorResource(string filename, string layer) 
         : _Filename(filename), _PrimaryKey("") {
         // conditional compilation
-        #ifdef GDAL2
+        #if defined(GDAL2) || defined(GDAL3)
             _OGRDataSource.reset((OGRDataSource*)GDALOpenEx(filename.c_str(), GDAL_OF_READONLY, NULL, NULL, NULL), OGRDataSource::DestroyDataSource);
         #else
             _OGRDataSource.reset(OGRSFDriverRegistrar::Open(filename.c_str()), OGRDataSource::DestroyDataSource);

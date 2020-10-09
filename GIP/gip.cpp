@@ -35,6 +35,9 @@ namespace gip {
         GDALAllRegister();
         OGRRegisterAll();
         CPLPushErrorHandler(CPLQuietErrorHandler);
+        #if defined( GDAL3 )
+        CPLSetConfigOption("OGR_CT_FORCE_TRADITIONAL_GIS_ORDER", "YES");
+        #endif
     }
 
 } // namespace gip
