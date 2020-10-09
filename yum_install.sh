@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO tied for now to `FROM developmentseed/geolambda:1.0.0`; see Dockerfile
-
 set -ev
 
 yum install -y swig
