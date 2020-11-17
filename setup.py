@@ -36,7 +36,6 @@ from imp import load_source
 # setup imports
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
-from setuptools.command.install import install
 from setuptools.command.develop import develop
 from setuptools.command.build_py import build_py
 
