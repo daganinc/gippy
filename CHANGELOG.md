@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v1.0.5] - 2020-10-23
+- add parameters to dockerfile for `BASE_IMAGE` and `UBUNTUGIS_PPA`
+- move old install.sh to yum_install.sh
+- add install.sh for ubuntu
+- add ci pipelines for 16.04, 18.04 and 20.04
+- add support for GDAL v3 and v3.1
+
+
+## [v1.0.4] - 2020-03-17
+- fix(chunks): using numchunks didn't cover image
+- drop python2.7 support
+- use updated pip from pypa.org
+- handle point-space to pixel-space transformations for cookiecutter
+- wrap setuptools `build_py` instead of install install
+- add gitlab-ci config
+- fix Python.h include
+
 
 ## [v1.0.3] - 2019-03-18
 - fixes setting of nodata in GeoImage.open function
