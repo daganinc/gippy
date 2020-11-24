@@ -1,23 +1,226 @@
-make_image:
+twenty_oh_four:
   stage: build
   script:
     - git fetch
     - git checkout $CI_COMMIT_REF_NAME
     - git reset --hard origin/$CI_COMMIT_REF_NAME
     - git clean -xfd
-    - time docker build . --no-cache -t gippy:$CI_COMMIT_REF_SLUG
+    - time docker build .
+      --no-cache
+      -t gippy:tof-$CI_COMMIT_REF_SLUG
   tags:
     - gipsdev
   after_script:
    - docker system prune -f
 
-
-run_tests:
+tof_tests:
   stage: test
+  needs:
+    - twenty_oh_four
   script:
-    - docker run --rm gippy:$CI_COMMIT_REF_SLUG pytest --cov gippy
+    - docker run --workdir /build/test
+      -v ${PWD}:/backdoor
+      --rm gippy:tof-$CI_COMMIT_REF_SLUG
+      pytest --cov gippy
+      --junit-xml=/backdoor/tof-$CI_COMMIT_REF_SLUG.xml
   tags:
     - gipsdev
+  artifacts:
+    reports:
+      junit: tof-$CI_COMMIT_REF_SLUG.xml
   after_script:
-    - docker image rm gippy:$CI_COMMIT_REF_SLUG
-    - docker system prune -f
+    - docker image rm gippy:tof-$CI_COMMIT_REF_SLUG
+
+
+twenty_oh_four_ubuntugis:
+  stage: build
+  script:
+    - git fetch
+    - git checkout $CI_COMMIT_REF_NAME
+    - git reset --hard origin/$CI_COMMIT_REF_NAME
+    - git clean -xfd
+    - time docker build .
+      --no-cache
+      --build-arg UBUNTUGIS_PPA="ppa:ubuntugis/ubuntugis-unstable"
+      -t gippy:tof-ugu-$CI_COMMIT_REF_SLUG
+  tags:
+    - gipsdev
+  # only:
+  #   - develop
+  after_script:
+   - docker system prune -f
+
+tof_ugu_tests:
+  stage: test
+  needs:
+    - twenty_oh_four_ubuntugis
+  script:
+    - docker run --workdir /build/test
+      -v ${PWD}:/backdoor
+      --rm gippy:tof-ugu-$CI_COMMIT_REF_SLUG
+      pytest --cov gippy
+      --junit-xml=/backdoor/tof-ugu-$CI_COMMIT_REF_SLUG.xml
+  tags:
+    - gipsdev
+  artifacts:
+    reports:
+      junit: tof-ugu-$CI_COMMIT_REF_SLUG.xml
+  after_script:
+    - docker image rm gippy:tof-ugu-$CI_COMMIT_REF_SLUG
+
+sixteen_oh_four:
+  stage: build
+  script:
+    - git fetch
+    - git checkout $CI_COMMIT_REF_NAME
+    - git reset --hard origin/$CI_COMMIT_REF_NAME
+    - git clean -xfd
+    - time docker build .
+      --build-arg BASE_IMAGE="ubuntu:16.04"
+      --build-arg UBUNTUGIS_PPA="FALSE"
+      --no-cache
+      -t gippy:sof-$CI_COMMIT_REF_SLUG
+  tags:
+    - gipsdev
+  only:
+    - develop
+  after_script:
+   - docker system prune -f
+
+sof:
+  stage: test
+  needs:
+    - sixteen_oh_four
+  script:
+    - export BUILD_SLUG=$CI_JOB_NAME-$CI_COMMIT_REF_SLUG
+    - docker run --workdir /build/test
+      -v ${PWD}:/backdoor
+      --rm gippy:${BUILD_SLUG}
+      pytest --cov gippy --junit-xml=/backdoor/${BUILD_SLUG}-junit.xml
+  tags:
+    - gipsdev
+  only:
+    - develop
+  artifacts:
+    reports:
+      junit: sof-$CI_COMMIT_REF_SLUG-junit.xml
+  after_script:
+    - docker image rm gippy:sof-$CI_COMMIT_REF_SLUG
+
+
+eighteen_oh_four_ubuntugis:
+  stage: build
+  script:
+    - git fetch
+    - git checkout $CI_COMMIT_REF_NAME
+    - git reset --hard origin/$CI_COMMIT_REF_NAME
+    - git clean -xfd
+    - time docker build .
+      --build-arg BASE_IMAGE="ubuntu:18.04"
+      --build-arg UBUNTUGIS_PPA="ppa:ubuntugis/ppa"
+      --no-cache
+      -t gippy:eof-ugs-$CI_COMMIT_REF_SLUG
+  tags:
+    - gipsdev
+  # only:
+  #   - develop
+  after_script:
+   - docker system prune -f
+
+eof_ugs_tests:
+  stage: test
+  needs:
+    - eighteen_oh_four_ubuntugis
+  script:
+    - docker run --workdir /build/test
+      -v ${PWD}:/backdoor
+      --rm gippy:eof-ugs-$CI_COMMIT_REF_SLUG
+      pytest --cov gippy
+      --junit-xml=/backdoor/eof-ugs-$CI_COMMIT_REF_SLUG.xml
+  tags:
+    - gipsdev
+  artifacts:
+    reports:
+      junit: eof-ugs-$CI_COMMIT_REF_SLUG.xml
+  after_script:
+    - docker image rm gippy:eof-ugs-$CI_COMMIT_REF_SLUG
+
+
+eighteen_oh_four_unstable:
+  stage: build
+  script:
+    - git fetch
+    - git checkout $CI_COMMIT_REF_NAME
+    - git reset --hard origin/$CI_COMMIT_REF_NAME
+    - git clean -xfd
+    - time docker build .
+      --build-arg BASE_IMAGE="ubuntu:18.04"
+      --build-arg UBUNTUGIS_PPA="ppa:ubuntugis/ubuntugis-unstable"
+      --no-cache
+      -t gippy:eof-ugu-$CI_COMMIT_REF_SLUG
+  tags:
+    - gipsdev
+  # only:
+  #   - develop
+  after_script:
+   - docker system prune -f
+
+eof_ugu_tests:
+  stage: test
+  needs:
+    - eighteen_oh_four_unstable
+  script:
+    - docker run --workdir /build/test
+      -v ${PWD}:/backdoor
+      --rm gippy:eof-ugu-$CI_COMMIT_REF_SLUG
+      pytest --cov gippy
+      --junit-xml=/backdoor/eof-ugu-$CI_COMMIT_REF_SLUG.xml
+  tags:
+    - gipsdev
+  artifacts:
+    reports:
+      junit: eof-ugu-$CI_COMMIT_REF_SLUG.xml
+  after_script:
+    - docker image rm gippy:eof-ugu-$CI_COMMIT_REF_SLUG
+
+
+#################### DEAD ########################
+# # ubuntugis-unstable-16.04 stopped with gdal==2.2.2 which segfaults when
+# # testing gippy.algorithms
+# sixteen_oh_four_ubuntugis:
+#   stage: build
+#   script:
+#     - git fetch
+#     - git checkout $CI_COMMIT_REF_NAME
+#     - git reset --hard origin/$CI_COMMIT_REF_NAME
+#     - git clean -xfd
+#     - time docker build .
+#       --build-arg BASE_IMAGE="ubuntu:16.04"
+#       --build-arg UBUNTUGIS_PPA="ppa:ubuntugis/ubuntugis-unstable"
+#       --no-cache
+#       -t gippy:sof-ugu-$CI_COMMIT_REF_SLUG
+#   tags:
+#     - gipsdev
+#   # only:
+#   #   - develop
+#   after_script:
+#    - docker system prune -f
+
+# sof_ugu_tests:
+#   stage: test
+#   needs:
+#     - sixteen_oh_four_ubuntugis
+#   script:
+#     - docker run --workdir /build/test
+#       -v ${PWD}:/backdoor
+#       --rm gippy:sof-ugu-$CI_COMMIT_REF_SLUG
+#       pytest --cov gippy
+#       --junit-xml=/backdoor/sof-ugu-$CI_COMMIT_REF_SLUG.xml
+#   tags:
+#     - gipsdev
+#   artifacts:
+#     reports:
+#       junit: sof-ugu-$CI_COMMIT_REF_SLUG.xml
+#   after_script:
+#     - docker image rm gippy:sof-ugu-$CI_COMMIT_REF_SLUG
+

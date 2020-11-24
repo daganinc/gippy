@@ -29,6 +29,7 @@
 #include <vector>
 #include <algorithm>
 #include <gdal_priv.h>
+#include <gdal_alg_priv.h>
 #include <ogrsf_frmts.h>
 #include <gdalwarper.h>
 
@@ -149,10 +150,12 @@ namespace gip {
         return intarray;
     }
 
-    //! Transformer class 
+    //! Transformer class  -- TODO: use gdal/apps/gdalwarp_lib directly
     class CutlineTransformer : public OGRCoordinateTransformation {
     public:
         void *hSrcImageTransformer;
+
+        explicit CutlineTransformer(void* hTransformArg = NULL): hSrcImageTransformer(hTransformArg) {}
 
         virtual OGRSpatialReference *GetSourceCS() { return NULL; }
         virtual OGRSpatialReference *GetTargetCS() { return NULL; }
@@ -174,6 +177,14 @@ namespace gip {
         virtual int TransformEx( int nCount, double *x, double *y, double *z = NULL, int *pabSuccess = NULL ) {
             return GDALGenImgProjTransform( hSrcImageTransformer, TRUE, nCount, x, y, z, pabSuccess );
         }
+
+        #ifdef GDAL31
+        virtual OGRCoordinateTransformation *Clone() const override
+        {
+            return new CutlineTransformer(
+                GDALCloneTransformer(hSrcImageTransformer));
+        }
+        #endif
     };
 
 }

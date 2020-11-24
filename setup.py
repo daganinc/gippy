@@ -36,7 +36,6 @@ from imp import load_source
 # setup imports
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
-from setuptools.command.install import install
 from setuptools.command.develop import develop
 from setuptools.command.build_py import build_py
 
@@ -184,7 +183,8 @@ if gdal_config.version()[0] == 2:
     extra_compile_args.append('-D GDAL2')
 elif gdal_config.version()[0] == 3:
     extra_compile_args.append('-D GDAL3')
-
+    if gdal_config.version()[1] > 0:
+        extra_compile_args.append('-D GDAL31')
 extra_link_args = gdal_config.extra_link_args
 
 # not sure if current directory is necessary here

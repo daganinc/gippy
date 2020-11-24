@@ -1,6 +1,11 @@
-FROM ubuntu:20.04
+ARG BASE_IMAGE="ubuntu:20.04"
+
+FROM $BASE_IMAGE
+
+ARG UBUNTUGIS_PPA=""
+
 
 WORKDIR /build
 COPY . /build
-RUN ./install.sh
+RUN export UBUNTUGIS_PPA="$UBUNTUGIS_PPA";  ./install.sh 
 
