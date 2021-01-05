@@ -1,23 +1,11 @@
-FROM developmentseed/geolambda:latest
- 
+ARG BASE_IMAGE="ubuntu:20.04"
+
+FROM $BASE_IMAGE
+
+ARG UBUNTUGIS_PPA=""
+
+
 WORKDIR /build
-
-RUN \
-    yum install -y swig;
-
-COPY requirements*txt /build/
-RUN \
-    pip2 install -r requirements.txt; \
-    pip2 install -r requirements-dev.txt; \
-    pip3 install -r requirements.txt; \
-    pip3 install -r requirements-dev.txt;
-
 COPY . /build
-RUN \
-    git clean -xfd; \
-    pip2 install .; \
-    git clean -xfd; \
-    pip3 install .; \
-    rm -rf /build/*;
+RUN export UBUNTUGIS_PPA="$UBUNTUGIS_PPA";  ./install.sh 
 
-WORKDIR /home/geolambda
